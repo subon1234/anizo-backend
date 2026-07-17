@@ -16,6 +16,7 @@ const recommendationRoute = require("./routes/recommendation");
 const artistRoute = require("./routes/artist");
 const albumRoute = require("./routes/album");
 const app = express();
+const genreRoute = require("./routes/genre");
 
 app.use(cors());
 
@@ -51,6 +52,7 @@ app.use("/home", homeRoute);
 app.use("/trending", trendingRoute);
 app.use("/recommendations", recommendationRoute);
 app.use("/albums", albumRoute);
+app.use("/genres", genreRoute);
 
 app.use((req, res) => {
   res.status(404).json({
