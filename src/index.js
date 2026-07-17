@@ -2,37 +2,48 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+const app = express();
+
+// Middleware
 const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 
+// Routes
 const searchRoute = require("./routes/search");
 const playRoute = require("./routes/play");
 const lyricsRoute = require("./routes/lyrics");
 const playlistRoute = require("./routes/playlist");
 const homeRoute = require("./routes/home");
+const trendingRoute = require("./routes/trending");
 
-const app = express();
-
-// Middleware
+// App Middleware
 app.use(cors());
 app.use(express.json());
 app.use(logger);
 
-// Routes
+// API Routes
 app.use("/search", searchRoute);
 app.use("/play", playRoute);
 app.use("/lyrics", lyricsRoute);
 app.use("/playlist", playlistRoute);
 app.use("/home", homeRoute);
+app.use("/trending", trendingRoute);
 
-// Root
+// Root Endpoint
 app.get("/", (req, res) => {
   res.json({
     success: true,
     name: "Anizo API",
-    version: "2.0.0",
+    version: "2.1.0",
     status: "Online",
-    message: "Anizo Backend V2 is running successfully."
+    endpoints: {
+      search: "/search?q=",
+      play: "/play?id=",
+      lyrics: "/lyrics",
+      playlist: "/playlist",
+      home: "/home",
+      trending: "/trending"
+    }
   });
 });
 
@@ -47,14 +58,13 @@ app.use((req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
+// Start Server
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`
-=================================
-🎵 Anizo Backend V2
-🚀 Running on Port ${PORT}
-🌐 http://localhost:${PORT}
-=================================
-`);
+  console.log("====================================");
+  console.log("🎵 Anizo Backend V2 Started");
+  console.log(`🚀 Port : ${PORT}`);
+  console.log(`🌍 Local: http://localhost:${PORT}`);
+  console.log("====================================");
 });
