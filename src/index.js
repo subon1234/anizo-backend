@@ -6,12 +6,14 @@ const playRoute = require("./routes/play");
 const app = express();
 const lyricsRoute = require("./routes/lyrics");
 const playlistRoute = require("./routes/playlist");
+const homeRoute = require("./routes/home");
 
 app.use(cors());
 app.use(express.json());
 app.use("/play", playRoute);
 app.use("/lyrics", lyricsRoute);
 app.use("/playlist", playlistRoute);
+app.use("/home", homeRoute);
 
 app.get("/", (req, res) => {
   res.json({
