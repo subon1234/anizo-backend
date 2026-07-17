@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { search } = require("../controllers/searchController");
+const { playlist } = require("../controllers/playlistController");
 
-router.get("/", search);
+router.get("/", playlist);
 
 module.exports = router;

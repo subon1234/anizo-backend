@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { search } = require("../controllers/searchController");
+const { play } = require("../controllers/playController");
 
-router.get("/", search);
+router.get("/", play);
 
 module.exports = router;
