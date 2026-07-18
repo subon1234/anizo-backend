@@ -19,25 +19,58 @@ async function getSong(videoId) {
     .filter(
       format =>
         format.acodec !== "none" &&
-        format.vcodec === "none"
+        format.vcodec === "none" &&
+        format.url
     )
     .sort((a, b) => (b.abr || 0) - (a.abr || 0));
 
-  const bestAudio = audioFormats[0] || null;
+  const streams = audioFormats.map(format => ({
+    quality: `${format.abr || "Unknown"} kbps`,
+    bitrate: format.abr || null,
+    codec: format.acodec || null,
+    container: format.ext || null,
+    url: format.url
+  }));
+
+  const bestAudio = streams[0] || null;
+
+  const thumbnails = info.thumbnails || [];
+
+  const artwork =
+    thumbnails.length > 0
+      ? thumbnails[thumbnails.length - 1].url
+      : info.thumbnail;
 
   const song = {
-    videoId,
-    title: info.title,
-    artist: info.uploader,
-    duration: info.duration,
-    thumbnail: info.thumbnail,
+    success: true,
 
-    stream: {
-      url: bestAudio?.url || null,
-      bitrate: bestAudio?.abr || null,
-      codec: bestAudio?.acodec || null,
-      container: bestAudio?.ext || null
-    }
+    videoId,
+
+    title: info.title || "",
+
+    artist: {
+      name: info.uploader || "",
+      id: info.channel_id || "",
+      thumbnail: artwork
+    },
+
+    album: info.album || null,
+
+    duration: info.duration || 0,
+
+    views: info.view_count || 0,
+
+    uploadDate: info.upload_date || null,
+
+    description: info.description || "",
+
+    artwork,
+
+    lyricsAvailable: false,
+
+    stream: bestAudio,
+
+    streams
   };
 
   cache.set(cacheKey, song, 300);
