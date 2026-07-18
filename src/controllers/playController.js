@@ -5,6 +5,7 @@ const { success, error } = require("../utils/response");
 
 async function play(req, res) {
   try {
+
     const id = req.query.id;
 
     const validation = validateVideoId(id);
@@ -21,15 +22,17 @@ async function play(req, res) {
     };
 
     try {
+
       const lyricData = await getLyrics(
         song.title,
-        song.artist
+        song.artist.name
       );
 
       lyrics = {
-        synced: lyricData.syncedLyrics || null,
-        plain: lyricData.plainLyrics || null
+        synced: lyricData.syncedLyrics,
+        plain: lyricData.plainLyrics
       };
+
     } catch (e) {
       console.log("Lyrics not found");
     }
@@ -44,7 +47,13 @@ async function play(req, res) {
     );
 
   } catch (err) {
-    return error(res, err.message, 500);
+
+    return error(
+      res,
+      err.message,
+      500
+    );
+
   }
 }
 
