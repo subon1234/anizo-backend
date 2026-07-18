@@ -2,9 +2,12 @@ const cache = require("../cache/memoryCache");
 const { getYoutube } = require("./youtubeService");
 
 async function searchSongs(query) {
-  const cacheKey = `search:${query.toLowerCase()}`;
+  if (!query || !query.trim()) {
+    return [];
+  }
 
-  // Return cached result
+  const cacheKey = `search:${query.trim().toLowerCase()}`;
+
   const cached = cache.get(cacheKey);
   if (cached) {
     return cached;
@@ -16,26 +19,63 @@ async function searchSongs(query) {
     type: "video"
   });
 
-  const songs = result.results
+  const songs = (result.results || [])
     .filter(item => item.type === "Video")
-    .map(item => ({
-      videoId: item.id,
-      title: item.title?.text || item.title || "",
-      artist:
-        item.author?.name ||
-        item.authors?.[0]?.name ||
-        "Unknown",
-      duration:
-        item.duration?.text ||
-        item.duration ||
-        "",
-      thumbnail:
-        item.thumbnails?.[0]?.url ||
-        item.thumbnail?.[0]?.url ||
-        ""
-    }));
+    .map(item => {
+      const thumbnails = item.thumbnails || item.thumbnail || [];
 
-  // Cache for 5 minutes
+      const artwork =
+        thumbnails.length > 0
+          ? thumbnails[thumbnails.length - 1].url
+          : "";
+
+      return {
+        videoId: item.id,
+
+        title:
+          item.title?.text ||
+          item.title ||
+          "Unknown Title",
+
+        artist: {
+          name:
+            item.author?.name ||
+            item.authors?.[0]?.name ||
+            "Unknown Artist",
+
+          id:
+            item.author?.id ||
+            item.author?.channel_id ||
+            null
+        },
+
+        duration:
+          item.duration?.text ||
+          item.duration ||
+          "--:--",
+
+        artwork,
+
+        thumbnail: artwork,
+
+        album: null,
+
+        views:
+          item.view_count ||
+          item.views ||
+          null,
+
+        uploadDate:
+          item.published?.text ||
+          item.published ||
+          null,
+
+        explicit: false,
+
+        playable: true
+      };
+    });
+
   cache.set(cacheKey, songs, 300);
 
   return songs;
